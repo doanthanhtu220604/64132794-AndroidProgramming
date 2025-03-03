@@ -46,7 +46,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     // xu ly cong
-    void XuLyCong (View v){
+    public void XuLyCong (View v){
         // xu ly cong o day
         //b1 lay du lieu 2 so
         // b1.1 tim edittext so 1 va so 2
@@ -69,7 +69,7 @@ public class MainActivity extends AppCompatActivity {
 
 
     }
-    void XuLyTru (View v){
+    public void XuLyTru (View v){
         // xu ly cong o day
         //b1 lay du lieu 2 so
         // b1.1 tim edittext so 1 va so 2
@@ -92,7 +92,7 @@ public class MainActivity extends AppCompatActivity {
 
 
     }
-    void XuLyNhan (View v){
+    public void XuLyNhan (View v){
         // xu ly cong o day
         //b1 lay du lieu 2 so
         // b1.1 tim edittext so 1 va so 2
@@ -115,7 +115,7 @@ public class MainActivity extends AppCompatActivity {
 
 
     }
-    void XuLyChia (View v){
+    public void XuLyChia (View v){
         // xu ly cong o day
         //b1 lay du lieu 2 so
         // b1.1 tim edittext so 1 va so 2
