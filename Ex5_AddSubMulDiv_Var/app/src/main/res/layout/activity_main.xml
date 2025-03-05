@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".MainActivity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:padding="5dp"
+        android:layout_marginTop="10dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Số thứ nhất"
+            android:textSize="18sp"
+            android:textColor="@color/black"
+            android:layout_marginRight="10dp"/>
+
+        <EditText
+            android:id="@+id/edtSo1"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="48dp"
+            android:hint="Mời nhập một số"
+            android:inputType="number"
+            android:padding="10dp"/>
+    </LinearLayout>
+
+    <!-- Nhập số thứ hai -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:padding="5dp"
+        android:layout_marginTop="10dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Số thứ hai"
+            android:textSize="18sp"
+            android:textColor="@color/black"
+            android:layout_marginRight="10dp"/>
+
+        <EditText
+            android:id="@+id/edtSo2"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="48dp"
+            android:hint="Mời nhập một số"
+            android:inputType="number"
+            android:padding="10dp"/>
+    </LinearLayout>
+
+    <!-- Các nút tính toán -->
+    <LinearLayout
+        android:gravity="center"
+        android:layout_width="match_parent"
+        android:padding="5dp"
+        android:orientation="horizontal"
+        android:layout_marginTop="15dp"
+        android:layout_height="80dp">
+        <Button
+            android:id="@+id/btnCong"
+            android:layout_margin="5dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="+"/>
+
+
+        <Button
+            android:id="@+id/btnTru"
+            android:layout_margin="5dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="-"/>
+
+
+        <Button
+            android:id="@+id/btnNhan"
+            android:layout_margin="5dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="*"/>
+
+
+        <Button
+            android:id="@+id/btnChia"
+            android:layout_margin="5dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="/"/>
+
+    </LinearLayout>
+
+    <!-- Hiển thị kết quả -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:padding="5dp"
+        android:layout_marginTop="15dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Kết quả:"
+            android:textSize="18sp"
+            android:textColor="@color/black"
+            android:layout_marginRight="10dp"/>
+
+        <EditText
+            android:id="@+id/edtKetQua"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="48dp"
+            android:hint="Nơi hiển thị kết quả"
+            android:enabled="false"
+            android:background="#E0E0E0"
+            android:textSize="16sp"
+            android:padding="10dp"/>
+    </LinearLayout>
+
+
+
+
+
+
+</LinearLayout>
+
+
