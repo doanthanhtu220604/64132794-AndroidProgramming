@@ -15,8 +15,8 @@ public class MainActivity extends AppCompatActivity {
     Button nutMH2;
     Button nutMH3;
     void TimDieuKhien (){
-        Button nutMH2 = (Button) findViewById(R.id.btnMH2);
-        Button nutMH3 = (Button) findViewById(R.id.btnMH3);
+        nutMH2 = (Button) findViewById(R.id.btnMH2);
+        nutMH3 = (Button) findViewById(R.id.btnMH3);
     }
 
     @Override
