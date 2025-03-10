@@ -17,3 +17,7 @@ Lưu trữ các bài thực hành android
 
 
 ![Image](https://github.com/user-attachments/assets/b3bb4bcb-1895-462e-8a96-5f208178825c)
+
+[Ex6_IntentDonGian]
+
+![Image](https://github.com/user-attachments/assets/be485222-0eb3-4adc-ba09-d3d3b58d865e)
