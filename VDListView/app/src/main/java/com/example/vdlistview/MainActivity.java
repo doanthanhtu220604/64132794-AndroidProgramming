@@ -1,6 +1,7 @@
 package com.example.vdlistview;
 
 import android.os.Bundle;
+import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
@@ -28,27 +29,30 @@ public class MainActivity extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
-
         listViewNNLT = findViewById(R.id.lvNNLT);
         dsNgonNguLT = new ArrayList<String>();
         dsNgonNguLT.add("Python");
-        dsNgonNguLT.add("Java");
+        dsNgonNguLT.add("PHP");
         dsNgonNguLT.add("C++");
-        dsNgonNguLT.add("C#");
 
-        ArrayAdapter<String> adapterNNLT = new ArrayAdapter<>(
-                this,
-                android.R.layout.simple_list_item_1,
-                dsNgonNguLT
+        ArrayAdapter <String> adapterNNLT = new ArrayAdapter<>(
+                this, android.R.layout.simple_list_item_1,dsNgonNguLT
         );
         listViewNNLT.setAdapter(adapterNNLT);
 
         listViewNNLT.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
-            public void onItemClick(AdapterView<?> parent, android.view.View view, int position, long id) {
-                String selectedLanguage = dsNgonNguLT.get(position);
-                Toast.makeText(MainActivity.this, "Bạn chọn: " + selectedLanguage, Toast.LENGTH_SHORT).show();
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                String selectedItem = dsNgonNguLT.get(position);
+                Toast.makeText(MainActivity.this, "Bạn đã chọn: " + selectedItem, Toast.LENGTH_SHORT).show();
             }
         });
+
+
+
+
+
+
+
     }
 }
