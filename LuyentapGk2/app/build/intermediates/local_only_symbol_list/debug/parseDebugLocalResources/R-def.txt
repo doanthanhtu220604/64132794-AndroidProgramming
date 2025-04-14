@@ -1,0 +1,27 @@
+R_DEF: Internal format may change without notice
+local
+color black
+color white
+drawable ic_launcher_background
+drawable ic_launcher_foreground
+id btnCau1
+id btnCau2
+id btnCau3
+id btnCau4
+id main
+id textView
+id textView2
+id textView3
+id textView4
+layout activity_cau1
+layout activity_cau2
+layout activity_cau3
+layout activity_cau4
+layout activity_main
+mipmap ic_launcher
+mipmap ic_launcher_round
+string app_name
+style Base.Theme.LuyentapGk2
+style Theme.LuyentapGk2
+xml backup_rules
+xml data_extraction_rules
