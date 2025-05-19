@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/mnu_Home"
+        android:icon="@drawable/baseline_home_24"
+        android:title="Home" />
+    <item
+        android:id="@+id/mnu_Genre"
+        android:icon="@drawable/baseline_local_movies_24"
+        android:title="Genre" />
+    <item
+        android:id="@+id/mnu_WatchList"
+        android:icon="@drawable/baseline_bookmark_24"
+        android:title="Watch List" />
+    <item
+        android:id="@+id/mnu_MyProfile"
+        android:icon="@drawable/baseline_person_24"
+        android:title="My Profile" />
+</menu>
