@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "940214694044",
+    "project_id": "gobimovie-a07a8",
+    "storage_bucket": "gobimovie-a07a8.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:940214694044:android:989182cda03a0ceb4ebd59",
+        "android_client_info": {
+          "package_name": "com.example.gobimovie"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD0dLzefsbUxV9VsQDWriwnyZ_9bbkSKpw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

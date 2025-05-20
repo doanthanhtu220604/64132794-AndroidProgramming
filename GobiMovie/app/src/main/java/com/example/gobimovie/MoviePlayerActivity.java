@@ -4,12 +4,14 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.Toast;
+
 import androidx.appcompat.app.AppCompatActivity;
+
 import com.google.android.exoplayer2.ExoPlayer;
 import com.google.android.exoplayer2.MediaItem;
 import com.google.android.exoplayer2.PlaybackException;
 import com.google.android.exoplayer2.Player;
-import com.google.android.exoplayer2.source.ProgressiveMediaSource;
+import com.google.android.exoplayer2.source.hls.HlsMediaSource;
 import com.google.android.exoplayer2.ui.PlayerView;
 import com.google.android.exoplayer2.upstream.DefaultDataSource;
 
@@ -25,7 +27,13 @@ public class MoviePlayerActivity extends AppCompatActivity {
 
         // Kiểm tra URL từ Intent
         if (getIntent().hasExtra("VIDEO_URL")) {
-            videoUrl = getIntent().getStringExtra("VIDEO_URL");
+            String rawUrl = getIntent().getStringExtra("VIDEO_URL");
+            // Trích xuất URL thực sự từ Tlink (loại bỏ phần wrapper "https://player.phimapi.com/player/?url=")
+            if (rawUrl != null && rawUrl.contains("?url=")) {
+                videoUrl = rawUrl.split("\\?url=")[1]; // Lấy phần sau "?url="
+            } else {
+                videoUrl = rawUrl; // Nếu không có wrapper, dùng nguyên URL
+            }
         }
 
         initExoPlayer();
@@ -53,8 +61,8 @@ public class MoviePlayerActivity extends AppCompatActivity {
         // Tạo DataSource Factory
         DefaultDataSource.Factory dataSourceFactory = new DefaultDataSource.Factory(this);
 
-        // Tạo ProgressiveMediaSource
-        ProgressiveMediaSource mediaSource = new ProgressiveMediaSource.Factory(dataSourceFactory)
+        // Tạo HlsMediaSource cho định dạng HLS (.m3u8)
+        HlsMediaSource mediaSource = new HlsMediaSource.Factory(dataSourceFactory)
                 .createMediaSource(MediaItem.fromUri(Uri.parse(videoUrl)));
 
         // Chuẩn bị và phát video

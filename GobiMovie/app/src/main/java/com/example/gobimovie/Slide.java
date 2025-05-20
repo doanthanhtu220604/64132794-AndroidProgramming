@@ -1,27 +1,40 @@
 package com.example.gobimovie;
 
 public class Slide {
-    private int Image;
-    private String Title;
+    private String Ttitle;
+    private String Turl;
+    private String Tvid;
 
-    public Slide(int image, String title) {
-        Image = image;
-        Title = title;
+    public Slide() {
     }
 
-    public int getImage() {
-        return Image;
+    public Slide(String ttitle, String turl, String tvid) {
+        Ttitle = ttitle;
+        Turl = turl;
+        Tvid = tvid;
     }
 
-    public void setImage(int image) {
-        Image = image;
+    public String getTtitle() {
+        return Ttitle;
     }
 
-    public String getTitle() {
-        return Title;
+    public void setTtitle(String ttitle) {
+        Ttitle = ttitle;
     }
 
-    public void setTitle(String title) {
-        Title = title;
+    public String getTurl() {
+        return Turl;
+    }
+
+    public void setTurl(String turl) {
+        Turl = turl;
+    }
+
+    public String getTvid() {
+        return Tvid;
+    }
+
+    public void setTvid(String tvid) {
+        Tvid = tvid;
     }
 }

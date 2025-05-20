@@ -9,6 +9,8 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
+
 import java.util.List;
 
 public class SlidePageAdapter extends RecyclerView.Adapter<SlidePageAdapter.SlideViewHolder> {
@@ -29,8 +31,12 @@ public class SlidePageAdapter extends RecyclerView.Adapter<SlidePageAdapter.Slid
     @Override
     public void onBindViewHolder(@NonNull SlideViewHolder holder, int position) {
         Slide slide = slideList.get(position);
-        holder.imageView.setImageResource(slide.getImage());
-        holder.textView.setText(slide.getTitle());
+        // Sử dụng Glide để tải hình ảnh từ URL
+        Glide.with(holder.itemView.getContext())
+                .load(slide.getTurl()) // Turl là URL của hình ảnh
+                .into(holder.imageView);
+        // Đặt tiêu đề từ Ttitle
+        holder.textView.setText(slide.getTtitle());
     }
 
     @Override

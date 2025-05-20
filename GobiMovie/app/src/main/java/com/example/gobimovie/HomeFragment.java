@@ -19,6 +19,11 @@ import androidx.viewpager2.widget.ViewPager2;
 
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,13 +34,20 @@ public class HomeFragment extends Fragment implements MovieItemClickListener {
     private List<Slide> lsSlides;
     private ViewPager2 sliderPager;
     private TabLayout indicator;
-    private Timer timer; // Biến để quản lý Timer
+    private Timer timer;
     private RecyclerView MoviesRV;
+    private SlidePageAdapter adapter;
+    private MovieAdapter movieAdapter; // Khai báo adapter ở cấp class để cập nhật sau
+    private List<Movie> lstMovies; // Khai báo danh sách ở cấp class
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
+        FirebaseDatabase database = FirebaseDatabase.getInstance();
+        DatabaseReference slideRef = database.getReference("trailer"); // Node cho slide (giữ nguyên)
+        DatabaseReference movieRef = database.getReference("featured"); // Node cho movie
+
         View view = inflater.inflate(R.layout.fragment_home, container, false);
 
         // Ánh xạ ViewPager2 và TabLayout từ layout
@@ -43,39 +55,69 @@ public class HomeFragment extends Fragment implements MovieItemClickListener {
         indicator = view.findViewById(R.id.indicator);
         MoviesRV = view.findViewById(R.id.Rv_movies);
 
-        // Khởi tạo danh sách slide
+        // Khởi tạo danh sách slide (giữ nguyên)
         lsSlides = new ArrayList<>();
-        lsSlides.add(new Slide(R.drawable.slide1, "Totoro"));
-        lsSlides.add(new Slide(R.drawable.slide2, "One Piece"));
-
-        // Gắn adapter cho ViewPager2
-        SlidePageAdapter adapter = new SlidePageAdapter(lsSlides);
+        adapter = new SlidePageAdapter(lsSlides);
         sliderPager.setAdapter(adapter);
-        // Kết nối TabLayout với ViewPager2 bằng TabLayoutMediator
+
+        // Lấy dữ liệu slide từ Firebase (giữ nguyên)
+        slideRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                lsSlides.clear();
+                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                    String title = dataSnapshot.child("Ttitle").getValue(String.class);
+                    String url = dataSnapshot.child("Turl").getValue(String.class);
+                    String vid = dataSnapshot.child("Tvid").getValue(String.class);
+                    if (title != null && url != null && vid != null) {
+                        lsSlides.add(new Slide(title, url, vid));
+                    }
+                }
+                adapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Toast.makeText(getContext(), "Failed to load slides: " + error.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        // Kết nối TabLayout với ViewPager2 bằng TabLayoutMediator (giữ nguyên)
         new TabLayoutMediator(indicator, sliderPager, (tab, position) -> {
-            // Tiêu đề tab theo từng slide
         }).attach();
 
-        // Khởi tạo và chạy Timer
+        // Khởi tạo và chạy Timer (giữ nguyên)
         startSliderTimer();
-        // RecyclerView setup
-        // int data
-        List<Movie> lstMovies = new ArrayList<>();
 
-        lstMovies.add(new Movie("Cuộc Hôn Nhân Hoàn Hảo", R.drawable.cuochonnhanhoanhoa,R.drawable.cuochonnhanhoanhaocover));
-        lstMovies.add(new Movie("Hạnh Phúc Bị Đánh Cắp", R.drawable.hanhphucbidanhcap,R.drawable.cuochonnhanhoanhaocover));
-        lstMovies.add(new Movie("Ngộ Nhập Quân Mộng", R.drawable.ngonhapquanmong,R.drawable.cuochonnhanhoanhaocover));
-        lstMovies.add(new Movie("Đại Tống Thiếu Niên Chí 2", R.drawable.daitongthieunhienchi2,R.drawable.cuochonnhanhoanhaocover));
-        lstMovies.add(new Movie("Ngộ Nhập Quân Mộng", R.drawable.ngonhapquanmong,R.drawable.cuochonnhanhoanhaocover));
-        lstMovies.add(new Movie("Cuộc Hôn Nhân Hoàn Hảo", R.drawable.cuochonnhanhoanhoa,R.drawable.cuochonnhanhoanhaocover));
-
-        MovieAdapter movieAdapter = new MovieAdapter(getContext(), lstMovies, this); // Sử dụng getContext()
+        // RecyclerView setup cho Movies
+        lstMovies = new ArrayList<>();
+        movieAdapter = new MovieAdapter(getContext(), lstMovies, this);
         MoviesRV.setAdapter(movieAdapter);
-        MoviesRV.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false)); // Sử dụng getContext()
+        MoviesRV.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
 
+        // Lấy dữ liệu movie từ Firebase
+        movieRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                lstMovies.clear(); // Xóa dữ liệu cũ
+                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                    // Ánh xạ dữ liệu từ Firebase vào object Movie
+                    String title = dataSnapshot.child("Ftitle").getValue(String.class);
+                    String link = dataSnapshot.child("Tlink").getValue(String.class);
+                    String des = dataSnapshot.child("Fdes").getValue(String.class);
+                    String thumbnail = dataSnapshot.child("Fthumbnail").getValue(String.class);
+                    if (title != null && link != null && des != null && thumbnail != null) {
+                        lstMovies.add(new Movie(title, link, des, thumbnail));
+                    }
+                }
+                movieAdapter.notifyDataSetChanged(); // Cập nhật adapter sau khi dữ liệu thay đổi
+            }
 
-
-
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Toast.makeText(getContext(), "Failed to load movies: " + error.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
 
         return view;
     }
@@ -87,31 +129,25 @@ public class HomeFragment extends Fragment implements MovieItemClickListener {
 
     @Override
     public void onMovieClick(Movie movie, ImageView movieImageView) {
-        // Tạo Intent để chuyển sang MovieDetailActivity
         Intent intent = new Intent(getContext(), MovieDetailActivity.class);
-        intent.putExtra("title", movie.getTitle());
-        intent.putExtra("imgURL", movie.getThumbnail());
-        intent.putExtra("imgCover",movie.getCoverPhoto());
+        intent.putExtra("title", movie.getFtitle());
+        intent.putExtra("imgURL", movie.getFthumbnail());
+        intent.putExtra("description", movie.getFdes()); // Thêm Fdes
+        intent.putExtra("videoURL", movie.getTlink()); // Thêm Tlink
 
-
-        // Tạo hiệu ứng chuyển đổi
         ActivityOptions options = ActivityOptions.makeSceneTransitionAnimation(
-                getActivity(), // Sử dụng getActivity() thay vì HomeFragment.this
-                movieImageView, // View được chia sẻ (ImageView của phim)
-                "movieImageTransition" // Tên chuyển đổi, phải khớp với MovieDetailActivity
+                getActivity(),
+                movieImageView,
+                "movieImageTransition"
         );
 
-        // Bắt đầu Activity với hiệu ứng chuyển đổi
         startActivity(intent, options.toBundle());
-
-        // Hiển thị Toast
-        Toast.makeText(getContext(), "Item clicked: " + movie.getTitle(), Toast.LENGTH_SHORT).show();
+        Toast.makeText(getContext(), "Item clicked: " + movie.getFtitle(), Toast.LENGTH_SHORT).show();
     }
 
     private class SliderTimer extends TimerTask {
         @Override
         public void run() {
-            // Kiểm tra xem Fragment có còn gắn với Activity không
             if (isAdded() && !isDetached() && getActivity() != null) {
                 getActivity().runOnUiThread(() -> {
                     if (sliderPager != null) {
@@ -127,11 +163,10 @@ public class HomeFragment extends Fragment implements MovieItemClickListener {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        // Hủy Timer khi Fragment View bị hủy
         if (timer != null) {
             timer.cancel();
             timer = null;
         }
-        sliderPager = null; // Tránh giữ tham chiếu không cần thiết
+        sliderPager = null;
     }
 }

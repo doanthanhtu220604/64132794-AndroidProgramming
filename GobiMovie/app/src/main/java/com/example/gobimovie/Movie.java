@@ -1,87 +1,51 @@
 package com.example.gobimovie;
 
 public class Movie {
-    private String title;
-    private String description;
-    private int thumbnail;
-    private String studio;
-    private String rating;
-    private String streamingLink;
-    private int coverPhoto;
+    private String Ftitle;
+    private String Fdes;
+    private String Fthumbnail;
+    private String Tlink;
 
-    public Movie(String title, int thumbnail, int coverPhoto) {
-        this.title = title;
-        this.thumbnail = thumbnail;
-        this.coverPhoto = coverPhoto;
+
+    public Movie() {
     }
 
-    public Movie(String title, int thumbnail) {
-        this.title = title;
-        this.thumbnail = thumbnail;
+    public Movie(String ftitle, String tlink, String fdes, String fthumbnail) {
+        Ftitle = ftitle;
+        Tlink = tlink;
+        Fdes = fdes;
+        Fthumbnail = fthumbnail;
     }
 
-    public Movie(String title, String streamingLink, String rating, String studio, int thumbnail, String description) {
-        this.title = title;
-        this.streamingLink = streamingLink;
-        this.rating = rating;
-        this.studio = studio;
-        this.thumbnail = thumbnail;
-        this.description = description;
+    public String getFtitle() {
+        return Ftitle;
     }
 
-    public int getCoverPhoto() {
-        return coverPhoto;
+    public void setFtitle(String ftitle) {
+        Ftitle = ftitle;
     }
 
-    public void setCoverPhoto(int coverPhoto) {
-        this.coverPhoto = coverPhoto;
+    public String getTlink() {
+        return Tlink;
     }
 
-    public String getTitle() {
-        return title;
+    public void setTlink(String tlink) {
+        Tlink = tlink;
     }
 
-    public String getDescription() {
-        return description;
+    public String getFthumbnail() {
+        return Fthumbnail;
     }
 
-    public int getThumbnail() {
-        return thumbnail;
+    public void setFthumbnail(String fthumbnail) {
+        Fthumbnail = fthumbnail;
     }
 
-    public String getStudio() {
-        return studio;
+    public String getFdes() {
+        return Fdes;
     }
 
-    public String getRating() {
-        return rating;
-    }
-
-    public String getStreamingLink() {
-        return streamingLink;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public void setThumbnail(int thumbnail) {
-        this.thumbnail = thumbnail;
-    }
-
-    public void setStudio(String studio) {
-        this.studio = studio;
-    }
-
-    public void setRating(String rating) {
-        this.rating = rating;
-    }
-
-    public void setStreamingLink(String streamingLink) {
-        this.streamingLink = streamingLink;
+    public void setFdes(String fdes) {
+        Fdes = fdes;
     }
 }
