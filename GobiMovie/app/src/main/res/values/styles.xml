@@ -1,0 +1,9 @@
+<resources>
+    <!-- Style cho Spinner -->
+    <style name="CustomSpinnerStyle">
+        <item name="android:textColor">@android:color/white</item> <!-- Màu chữ trắng -->
+        <item name="android:background">@android:color/darker_gray</item> <!-- Background xám đậm để nổi trên nền đen -->
+        <item name="android:popupBackground">@android:color/darker_gray</item> <!-- Background dropdown xám đậm -->
+        <item name="android:dropDownSelector">@android:color/white</item> <!-- Màu khi chọn item trong dropdown -->
+    </style>
+</resources>

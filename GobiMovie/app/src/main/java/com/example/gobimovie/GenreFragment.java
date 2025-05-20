@@ -1,64 +1,174 @@
 package com.example.gobimovie;
 
+import android.app.ActivityOptions;
+import android.content.Intent;
 import android.os.Bundle;
-
-import androidx.fragment.app.Fragment;
-
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.ImageView;
+import android.widget.Spinner;
+import android.widget.TextView;
+import android.widget.Toast;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link GenreFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
-public class GenreFragment extends Fragment {
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
-    public GenreFragment() {
-        // Required empty public constructor
-    }
+public class GenreFragment extends Fragment implements MovieItemClickListener {
+    private Spinner spinnerGenre;
+    private RecyclerView rvMoviesByGenre;
+    private MovieAdapter movieAdapter;
+    private List<Movie> allMovies;
+    private List<Movie> filteredMovies;
+    private List<String> genres;
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment GenreFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static GenreFragment newInstance(String param1, String param2) {
-        GenreFragment fragment = new GenreFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
-    }
-
+    @Nullable
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
+                             @Nullable Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.fragment_genre, container, false);
+
+        // Ánh xạ các thành phần giao diện
+        spinnerGenre = view.findViewById(R.id.spinner_genre);
+        rvMoviesByGenre = view.findViewById(R.id.rv_movies_by_genre);
+
+        // Khởi tạo danh sách
+        allMovies = new ArrayList<>();
+        filteredMovies = new ArrayList<>();
+        genres = new ArrayList<>();
+        genres.add("Tất cả");
+
+        // Khởi tạo RecyclerView với GridLayoutManager (3 cột)
+        movieAdapter = new MovieAdapter(getContext(), filteredMovies, this);
+        rvMoviesByGenre.setAdapter(movieAdapter);
+        rvMoviesByGenre.setLayoutManager(new GridLayoutManager(getContext(), 3)); // Sử dụng 3 cột
+
+        // Lấy dữ liệu từ Firebase
+        loadMoviesFromFirebase();
+
+        return view;
+    }
+
+    private void loadMoviesFromFirebase() {
+        DatabaseReference movieRef = FirebaseDatabase.getInstance().getReference("featured");
+        movieRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                allMovies.clear();
+                Set<String> genreSet = new HashSet<>();
+
+                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                    String title = dataSnapshot.child("Ftitle").getValue(String.class);
+                    String link = dataSnapshot.child("Tlink").getValue(String.class);
+                    String des = dataSnapshot.child("Fdes").getValue(String.class);
+                    String thumbnail = dataSnapshot.child("Fthumbnail").getValue(String.class);
+                    String genre = dataSnapshot.child("Fgenre").getValue(String.class);
+
+                    if (title != null && link != null && des != null && thumbnail != null && genre != null) {
+                        Movie movie = new Movie(title, link, des, thumbnail, genre);
+                        allMovies.add(movie);
+                        genreSet.add(genre);
+                    }
+                }
+
+                genres.clear();
+                genres.add("Tất cả");
+                genres.addAll(genreSet);
+                setupGenreSpinner();
+
+                filterMovies("Tất cả");
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Toast.makeText(getContext(), "Failed to load movies: " + error.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void setupGenreSpinner() {
+        // Tùy chỉnh Adapter cho Spinner với màu chữ trắng và background xám nhạt
+        ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<String>(getContext(), android.R.layout.simple_spinner_item, genres) {
+            @Override
+            public View getDropDownView(int position, View convertView, ViewGroup parent) {
+                View view = super.getDropDownView(position, convertView, parent);
+                TextView textView = (TextView) view;
+                textView.setTextColor(android.graphics.Color.WHITE); // Màu chữ trắng cho dropdown
+                textView.setBackgroundColor(android.graphics.Color.GRAY); // Background xám nhạt cho dropdown
+                return view;
+            }
+
+            @Override
+            public View getView(int position, View convertView, ViewGroup parent) {
+                View view = super.getView(position, convertView, parent);
+                TextView textView = (TextView) view;
+                textView.setTextColor(android.graphics.Color.WHITE); // Màu chữ trắng cho item được chọn
+                textView.setBackgroundColor(android.graphics.Color.GRAY); // Background xám nhạt cho item được chọn
+                return view;
+            }
+        };
+        spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinnerGenre.setAdapter(spinnerAdapter);
+
+        spinnerGenre.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                String selectedGenre = genres.get(position);
+                filterMovies(selectedGenre);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+                // Không làm gì
+            }
+        });
+    }
+
+    private void filterMovies(String genre) {
+        filteredMovies.clear();
+        if (genre.equals("Tất cả")) {
+            filteredMovies.addAll(allMovies);
+        } else {
+            for (Movie movie : allMovies) {
+                if (genre.equals(movie.getFgenre())) {
+                    filteredMovies.add(movie);
+                }
+            }
         }
+        movieAdapter.notifyDataSetChanged();
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_genre, container, false);
+    public void onMovieClick(Movie movie, ImageView movieImageView) {
+        Intent intent = new Intent(getContext(), MovieDetailActivity.class);
+        intent.putExtra("title", movie.getFtitle());
+        intent.putExtra("imgURL", movie.getFthumbnail());
+        intent.putExtra("description", movie.getFdes());
+        intent.putExtra("videoURL", movie.getTlink());
+
+        ActivityOptions options = ActivityOptions.makeSceneTransitionAnimation(
+                getActivity(),
+                movieImageView,
+                "movieImageTransition"
+        );
+
+        startActivity(intent, options.toBundle());
+        Toast.makeText(getContext(), "Item clicked: " + movie.getFtitle(), Toast.LENGTH_SHORT).show();
     }
 }

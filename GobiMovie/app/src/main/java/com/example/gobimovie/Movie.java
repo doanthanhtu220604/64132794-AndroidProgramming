@@ -5,16 +5,17 @@ public class Movie {
     private String Fdes;
     private String Fthumbnail;
     private String Tlink;
-
+    private String Fgenre;  // Thêm thuộc tính thể loại
 
     public Movie() {
     }
 
-    public Movie(String ftitle, String tlink, String fdes, String fthumbnail) {
+    public Movie(String ftitle, String tlink, String fdes, String fthumbnail, String fgenre) {
         Ftitle = ftitle;
         Tlink = tlink;
         Fdes = fdes;
         Fthumbnail = fthumbnail;
+        Fgenre = fgenre;
     }
 
     public String getFtitle() {
@@ -47,5 +48,13 @@ public class Movie {
 
     public void setFdes(String fdes) {
         Fdes = fdes;
+    }
+
+    public String getFgenre() {
+        return Fgenre;
+    }
+
+    public void setFgenre(String fgenre) {
+        Fgenre = fgenre;
     }
 }

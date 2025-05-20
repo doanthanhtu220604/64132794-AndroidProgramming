@@ -106,8 +106,10 @@ public class HomeFragment extends Fragment implements MovieItemClickListener {
                     String link = dataSnapshot.child("Tlink").getValue(String.class);
                     String des = dataSnapshot.child("Fdes").getValue(String.class);
                     String thumbnail = dataSnapshot.child("Fthumbnail").getValue(String.class);
-                    if (title != null && link != null && des != null && thumbnail != null) {
-                        lstMovies.add(new Movie(title, link, des, thumbnail));
+                    String genre = dataSnapshot.child("Fgenre").getValue(String.class); // Thêm dòng này
+
+                    if (title != null && link != null && des != null && thumbnail != null && genre != null) {
+                        lstMovies.add(new Movie(title, link, des, thumbnail, genre)); // Truyền đủ 5 tham số
                     }
                 }
                 movieAdapter.notifyDataSetChanged(); // Cập nhật adapter sau khi dữ liệu thay đổi
