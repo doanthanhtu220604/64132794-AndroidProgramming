@@ -18,22 +18,23 @@ import com.google.android.exoplayer2.upstream.DefaultDataSource;
 public class MoviePlayerActivity extends AppCompatActivity {
     private PlayerView playerView;
     private ExoPlayer player;
-    private String videoUrl = "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"; // URL mặc định
+    private String videoUrl;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_movie_player);
 
-        // Kiểm tra URL từ Intent
-        if (getIntent().hasExtra("VIDEO_URL")) {
-            String rawUrl = getIntent().getStringExtra("VIDEO_URL");
-            // Trích xuất URL thực sự từ Tlink (loại bỏ phần wrapper "https://player.phimapi.com/player/?url=")
-            if (rawUrl != null && rawUrl.contains("?url=")) {
-                videoUrl = rawUrl.split("\\?url=")[1]; // Lấy phần sau "?url="
-            } else {
-                videoUrl = rawUrl; // Nếu không có wrapper, dùng nguyên URL
-            }
+        // Lấy URL từ Intent
+        videoUrl = getIntent().getStringExtra("VIDEO_URL");
+        if (videoUrl == null || videoUrl.isEmpty()) {
+            videoUrl = "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"; // URL mặc định
+            Toast.makeText(this, "Không có URL video, sử dụng video mặc định.", Toast.LENGTH_SHORT).show();
+        }
+
+        // Xử lý URL nếu có wrapper
+        if (videoUrl.contains("?url=")) {
+            videoUrl = videoUrl.split("\\?url=")[1]; // Lấy phần sau "?url="
         }
 
         initExoPlayer();
@@ -41,7 +42,6 @@ public class MoviePlayerActivity extends AppCompatActivity {
     }
 
     private void hideActionBar() {
-        // Kiểm tra xem ActionBar có tồn tại trước khi ẩn
         if (getSupportActionBar() != null) {
             getSupportActionBar().hide();
         }
@@ -54,23 +54,18 @@ public class MoviePlayerActivity extends AppCompatActivity {
             return;
         }
 
-        // Khởi tạo ExoPlayer
         player = new ExoPlayer.Builder(this).build();
         playerView.setPlayer(player);
 
-        // Tạo DataSource Factory
         DefaultDataSource.Factory dataSourceFactory = new DefaultDataSource.Factory(this);
-
-        // Tạo HlsMediaSource cho định dạng HLS (.m3u8)
+        MediaItem mediaItem = MediaItem.fromUri(Uri.parse(videoUrl));
         HlsMediaSource mediaSource = new HlsMediaSource.Factory(dataSourceFactory)
-                .createMediaSource(MediaItem.fromUri(Uri.parse(videoUrl)));
+                .createMediaSource(mediaItem);
 
-        // Chuẩn bị và phát video
         player.setMediaSource(mediaSource);
         player.prepare();
         player.setPlayWhenReady(true);
 
-        // Xử lý lỗi và trạng thái
         player.addListener(new Player.Listener() {
             @Override
             public void onPlayerError(PlaybackException error) {

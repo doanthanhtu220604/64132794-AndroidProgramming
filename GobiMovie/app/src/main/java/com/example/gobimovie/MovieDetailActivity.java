@@ -2,22 +2,31 @@ package com.example.gobimovie;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
-import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import com.bumptech.glide.Glide;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 public class MovieDetailActivity extends AppCompatActivity {
     private ImageView MovieThumbnailImg, MovieCoverImg;
     private TextView tv_title, tv_description;
+    private Button buttonWatchMovie, buttonViewDetails;
+    private String movieGenre; // Lưu trữ thể loại để truyền sang MovieFullDetailsActivity
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,56 +39,106 @@ public class MovieDetailActivity extends AppCompatActivity {
             return insets;
         });
 
-        // Lấy dữ liệu từ Intent và hiển thị
+        // Khởi tạo giao diện và hiển thị dữ liệu
         iniView();
 
-        // Thêm sự kiện nhấn cho FloatingActionButton
-        FloatingActionButton playButton = findViewById(R.id.floatingActionButton3);
-        playButton.setOnClickListener(v -> {
-            // Lấy extras từ Intent
-            Bundle extras = getIntent().getExtras();
-            // Chuẩn bị Intent để mở MoviePlayerActivity
-            Intent intent = new Intent(MovieDetailActivity.this, MoviePlayerActivity.class);
-            // Truyền URL video từ Tlink (lấy từ extras)
-            String videoUrl = extras != null ? extras.getString("videoURL", "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4") : "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4";
-            intent.putExtra("VIDEO_URL", videoUrl);
-            startActivity(intent);
+        // Thiết lập sự kiện cho nút "Xem Phim"
+        buttonWatchMovie = findViewById(R.id.button_watch_movie);
+        buttonWatchMovie.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String videoUrl = getIntent().getStringExtra("videoURL");
+                if (videoUrl != null && !videoUrl.isEmpty()) {
+                    Intent intent = new Intent(MovieDetailActivity.this, MoviePlayerActivity.class);
+                    intent.putExtra("VIDEO_URL", videoUrl);
+                    startActivity(intent);
+                } else {
+                    Toast.makeText(MovieDetailActivity.this, "Không tìm thấy URL video!", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
+        // Thiết lập sự kiện cho nút "Xem Chi Tiết"
+        buttonViewDetails = findViewById(R.id.button_view_details);
+        buttonViewDetails.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Lấy dữ liệu từ Intent
+                String title = getIntent().getStringExtra("title");
+                String description = getIntent().getStringExtra("description");
+
+                // Mở MovieFullDetailsActivity và truyền dữ liệu
+                Intent intent = new Intent(MovieDetailActivity.this, MovieFullDetailsActivity.class);
+                intent.putExtra("title", title);
+                intent.putExtra("description", description);
+                intent.putExtra("genre", movieGenre); // Truyền thể loại lấy từ Firebase
+                startActivity(intent);
+            }
         });
     }
 
     void iniView() {
-        Bundle extras = getIntent().getExtras();
-        String movieTitle = extras != null ? extras.getString("title", "") : "";
-        String imageUrl = extras != null ? extras.getString("imgURL", "") : ""; // Lấy URL dưới dạng chuỗi
-        String description = extras != null ? extras.getString("description", "") : ""; // Lấy mô tả
-        String videoUrl = extras != null ? extras.getString("videoURL", "") : ""; // Lấy URL video
+        // Lấy dữ liệu từ Intent
+        String movieTitle = getIntent().getStringExtra("title");
+        String imageUrl = getIntent().getStringExtra("imgURL");
+        String description = getIntent().getStringExtra("description");
 
         // Khởi tạo ImageView
         MovieThumbnailImg = findViewById(R.id.detail_movie_img);
-        // Sử dụng Glide để tải hình ảnh từ URL
         Glide.with(this)
                 .load(imageUrl)
-                .placeholder(R.drawable.cuochonnhanhoanhoa) // Hình ảnh mặc định nếu URL không hợp lệ
+                .placeholder(R.drawable.cuochonnhanhoanhoa)
                 .into(MovieThumbnailImg);
 
-        // MovieCoverImg không được sử dụng vì Intent không truyền imgCover
         MovieCoverImg = findViewById(R.id.detail_movie_cover);
-        // Nếu bạn muốn hiển thị cover, cần truyền thêm từ HomeFragment, tạm thời đặt mặc định
         Glide.with(this)
-                .load(imageUrl) // Dùng cùng URL với thumbnail
+                .load(imageUrl)
                 .placeholder(R.drawable.cuochonnhanhoanhoa)
                 .into(MovieCoverImg);
 
         // Đặt tiêu đề
         tv_title = findViewById(R.id.detail_movie_title);
-        tv_title.setText(movieTitle);
-        ActionBar actionBar = getSupportActionBar();
-        if (actionBar != null) {
-            actionBar.setTitle(movieTitle);
+        if (movieTitle != null) {
+            tv_title.setText(movieTitle);
         }
 
         // Đặt mô tả
         tv_description = findViewById(R.id.detail_movie_desc);
-        tv_description.setText(description);
+        if (description != null) {
+            tv_description.setText(description);
+        }
+
+        // Lấy dữ liệu từ Firebase dựa trên tiêu đề phim
+        if (movieTitle != null) {
+            fetchMovieDetailsFromFirebase(movieTitle);
+        }
+    }
+
+    private void fetchMovieDetailsFromFirebase(String movieTitle) {
+        DatabaseReference movieRef = FirebaseDatabase.getInstance().getReference("featured");
+        movieRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot snapshot) {
+                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                    String title = dataSnapshot.child("Ftitle").getValue(String.class);
+                    if (title != null && title.equals(movieTitle)) {
+                        // Lấy thể loại từ Firebase
+                        movieGenre = dataSnapshot.child("Fgenre").getValue(String.class);
+                        Log.d("MovieDetailActivity", "Fetched Genre from Firebase: " + movieGenre);
+                        break;
+                    }
+                }
+                if (movieGenre == null) {
+                    movieGenre = "Không xác định";
+                    Log.d("MovieDetailActivity", "Genre not found in Firebase.");
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError error) {
+                Toast.makeText(MovieDetailActivity.this, "Lỗi khi lấy dữ liệu: " + error.getMessage(), Toast.LENGTH_SHORT).show();
+                movieGenre = "Không xác định";
+            }
+        });
     }
 }
