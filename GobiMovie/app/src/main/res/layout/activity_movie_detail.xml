@@ -19,6 +19,7 @@
             android:layout_height="245dp"
             android:scaleType="fitXY"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             tools:srcCompat="@tools:sample/backgrounds/scenic" />
@@ -32,17 +33,6 @@
             app:layout_constraintStart_toStartOf="@+id/detail_movie_cover"
             app:layout_constraintTop_toTopOf="@+id/detail_movie_cover"
             app:srcCompat="@drawable/gradien_bg" />
-
-        <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/floatingActionButton3"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:clickable="true"
-            app:layout_constraintBottom_toBottomOf="@+id/detail_movie_cover"
-            app:layout_constraintEnd_toEndOf="@+id/detail_movie_cover"
-            app:layout_constraintStart_toStartOf="@+id/detail_movie_cover"
-            app:layout_constraintTop_toTopOf="@+id/detail_movie_cover"
-            app:srcCompat="@drawable/baseline_play_arrow_24" />
 
         <ImageView
             android:id="@+id/detail_movie_img"
@@ -71,29 +61,32 @@
 
         <Button
             android:id="@+id/button_watch_movie"
-            android:layout_width="0dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="24dp"
             android:layout_marginTop="8dp"
             android:layout_marginEnd="24dp"
-            android:backgroundTint="#2196F3"
+            android:backgroundTint="@color/design_default_color_error"
             android:text="Xem Phim"
             android:textColor="@android:color/white"
+            app:icon="@drawable/baseline_play_circle_24"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@+id/detail_movie_img"
             app:layout_constraintTop_toBottomOf="@+id/detail_movie_title" />
 
         <Button
             android:id="@+id/button_view_details"
-            android:layout_width="0dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="24dp"
             android:layout_marginTop="8dp"
             android:layout_marginEnd="24dp"
-            android:backgroundTint="#2196F3"
-            android:text="Xem Chi Tiết"
+            android:backgroundTint="@color/design_default_color_error"
+            android:text="Chi Tiết"
             android:textColor="@android:color/white"
+            app:icon="@drawable/baseline_info_24"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.484"
             app:layout_constraintStart_toEndOf="@+id/detail_movie_img"
             app:layout_constraintTop_toBottomOf="@+id/button_watch_movie" />
 

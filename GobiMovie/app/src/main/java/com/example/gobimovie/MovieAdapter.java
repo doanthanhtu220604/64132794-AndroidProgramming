@@ -36,10 +36,10 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MyViewHolder
     @Override
     public void onBindViewHolder(@NonNull MyViewHolder myViewHolder, int i) {
         Movie movie = mData.get(i);
-        myViewHolder.TvTitle.setText(movie.getFtitle()); // Sử dụng getFtitle()
-        // Sử dụng Glide để tải hình ảnh từ URL
+        myViewHolder.TvTitle.setText(movie.getFtitle()); // Hiển thị tiêu đề phim
+        // Sử dụng Glide để tải ảnh poster từ Fpos
         Glide.with(context)
-                .load(movie.getFthumbnail()) // Fthumbnail là URL
+                .load(movie.getFpos()) // Sử dụng Fpos thay vì Fthumbnail
                 .into(myViewHolder.ImgMovie);
     }
 

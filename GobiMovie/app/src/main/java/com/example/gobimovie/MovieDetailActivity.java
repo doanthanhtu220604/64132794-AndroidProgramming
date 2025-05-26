@@ -80,21 +80,18 @@ public class MovieDetailActivity extends AppCompatActivity {
     void iniView() {
         // Lấy dữ liệu từ Intent
         String movieTitle = getIntent().getStringExtra("title");
-        String imageUrl = getIntent().getStringExtra("imgURL");
+        String imageUrl = getIntent().getStringExtra("imgURL"); // Chứa Fpos
         String description = getIntent().getStringExtra("description");
 
         // Khởi tạo ImageView
         MovieThumbnailImg = findViewById(R.id.detail_movie_img);
         Glide.with(this)
-                .load(imageUrl)
+                .load(imageUrl) // Tải poster (Fpos) vào detail_movie_img
                 .placeholder(R.drawable.cuochonnhanhoanhoa)
                 .into(MovieThumbnailImg);
 
         MovieCoverImg = findViewById(R.id.detail_movie_cover);
-        Glide.with(this)
-                .load(imageUrl)
-                .placeholder(R.drawable.cuochonnhanhoanhoa)
-                .into(MovieCoverImg);
+        // Không tải ảnh cho MovieCoverImg ở đây, sẽ tải trong fetchMovieDetailsFromFirebase
 
         // Đặt tiêu đề
         tv_title = findViewById(R.id.detail_movie_title);
@@ -124,6 +121,19 @@ public class MovieDetailActivity extends AppCompatActivity {
                     if (title != null && title.equals(movieTitle)) {
                         // Lấy thể loại từ Firebase
                         movieGenre = dataSnapshot.child("Fgenre").getValue(String.class);
+                        // Lấy thumbnail từ Firebase
+                        String thumbnail = dataSnapshot.child("Fthumbnail").getValue(String.class);
+
+                        // Tải thumbnail vào detail_movie_cover
+                        if (thumbnail != null) {
+                            Glide.with(MovieDetailActivity.this)
+                                    .load(thumbnail)
+                                    .placeholder(R.drawable.cuochonnhanhoanhoa)
+                                    .into(MovieCoverImg);
+                        } else {
+                            Log.d("MovieDetailActivity", "Thumbnail not found in Firebase.");
+                        }
+
                         Log.d("MovieDetailActivity", "Fetched Genre from Firebase: " + movieGenre);
                         break;
                     }

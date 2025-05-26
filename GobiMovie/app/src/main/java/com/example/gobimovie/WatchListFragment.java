@@ -1,5 +1,6 @@
 package com.example.gobimovie;
 
+import android.annotation.SuppressLint;
 import android.app.ActivityOptions;
 import android.content.Intent;
 import android.os.Bundle;
@@ -8,8 +9,12 @@ import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -25,15 +30,23 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class WatchListFragment extends Fragment implements MovieItemClickListener {
+    private Spinner spinnerGenre;
+    private ImageView searchIcon, cancelSearch;
     private EditText etSearch;
     private RecyclerView rvSearchResults;
     private MovieAdapter movieAdapter;
     private List<Movie> allMovies;
     private List<Movie> filteredMovies;
+    private List<String> genres;
+    private String currentGenre = "Tất cả";
+    private String currentQuery = "";
 
+    @SuppressLint("MissingInflatedId")
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
@@ -41,29 +54,54 @@ public class WatchListFragment extends Fragment implements MovieItemClickListene
         View view = inflater.inflate(R.layout.fragment_watch_list, container, false);
 
         // Ánh xạ các thành phần giao diện
+        spinnerGenre = view.findViewById(R.id.spinner_genre);
+        searchIcon = view.findViewById(R.id.search_icon);
         etSearch = view.findViewById(R.id.et_search);
+        cancelSearch = view.findViewById(R.id.cancel_search);
         rvSearchResults = view.findViewById(R.id.rv_search_results);
 
         // Khởi tạo danh sách
         allMovies = new ArrayList<>();
         filteredMovies = new ArrayList<>();
+        genres = new ArrayList<>();
+        genres.add("Tất cả");
 
-        // Khởi tạo RecyclerView với GridLayoutManager (3 cột) - giống GenreFragment
+        // Khởi tạo RecyclerView với GridLayoutManager (2 cột)
         movieAdapter = new MovieAdapter(getContext(), filteredMovies, this);
         rvSearchResults.setAdapter(movieAdapter);
-        rvSearchResults.setLayoutManager(new GridLayoutManager(getContext(), 3)); // Sử dụng 3 cột
+        rvSearchResults.setLayoutManager(new GridLayoutManager(getContext(), 2));
+         // Khoảng cách item
 
         // Lấy dữ liệu từ Firebase
         loadMoviesFromFirebase();
 
-        // Thêm TextWatcher để lọc phim khi nhập từ khóa
+        // Sự kiện nhấn icon tìm kiếm
+        searchIcon.setOnClickListener(v -> {
+            searchIcon.setVisibility(View.GONE);
+            etSearch.setVisibility(View.VISIBLE);
+            cancelSearch.setVisibility(View.VISIBLE);
+            etSearch.requestFocus(); // Mở bàn phím
+        });
+
+        // Sự kiện nhấn nút hủy
+        cancelSearch.setOnClickListener(v -> {
+            etSearch.setText("");
+            etSearch.setVisibility(View.GONE);
+            cancelSearch.setVisibility(View.GONE);
+            searchIcon.setVisibility(View.VISIBLE);
+            currentQuery = "";
+            filterMovies(); // Cập nhật danh sách theo thể loại
+        });
+
+        // TextWatcher cho tìm kiếm
         etSearch.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                filterMovies(s.toString());
+                currentQuery = s.toString();
+                filterMovies();
             }
 
             @Override
@@ -74,12 +112,12 @@ public class WatchListFragment extends Fragment implements MovieItemClickListene
     }
 
     private void loadMoviesFromFirebase() {
-        // Logic lấy dữ liệu từ Firebase giống GenreFragment
         DatabaseReference movieRef = FirebaseDatabase.getInstance().getReference("featured");
         movieRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 allMovies.clear();
+                Set<String> genreSet = new HashSet<>();
 
                 for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
                     String title = dataSnapshot.child("Ftitle").getValue(String.class);
@@ -87,23 +125,21 @@ public class WatchListFragment extends Fragment implements MovieItemClickListene
                     String des = dataSnapshot.child("Fdes").getValue(String.class);
                     String thumbnail = dataSnapshot.child("Fthumbnail").getValue(String.class);
                     String genre = dataSnapshot.child("Fgenre").getValue(String.class);
+                    String poster = dataSnapshot.child("Fpos").getValue(String.class);
 
-                    // Kiểm tra null giống GenreFragment
-                    if (title != null && link != null && des != null && thumbnail != null && genre != null) {
-                        Movie movie = new Movie(title, link, des, thumbnail, genre);
+                    if (title != null && link != null && des != null && thumbnail != null && genre != null && poster != null) {
+                        Movie movie = new Movie(title, link, des, thumbnail, genre, poster);
                         allMovies.add(movie);
+                        genreSet.add(genre);
                     }
                 }
 
-                // Hiển thị tất cả phim ban đầu - giống GenreFragment
-                filteredMovies.clear();
-                filteredMovies.addAll(allMovies);
-                movieAdapter.notifyDataSetChanged();
+                genres.clear();
+                genres.add("Tất cả");
+                genres.addAll(genreSet);
+                setupGenreSpinner();
 
-                // Nếu không có phim, hiển thị thông báo
-                if (allMovies.isEmpty()) {
-                    Toast.makeText(getContext(), "No movies available in watchlist.", Toast.LENGTH_SHORT).show();
-                }
+                filterMovies();
             }
 
             @Override
@@ -113,38 +149,67 @@ public class WatchListFragment extends Fragment implements MovieItemClickListene
         });
     }
 
-    private void filterMovies(String query) {
-        // Lọc phim theo từ khóa tìm kiếm (tương tự cách GenreFragment lọc theo thể loại)
+    private void setupGenreSpinner() {
+        ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<String>(getContext(), android.R.layout.simple_spinner_item, genres) {
+            @Override
+            public View getDropDownView(int position, View convertView, ViewGroup parent) {
+                View view = super.getDropDownView(position, convertView, parent);
+                TextView textView = (TextView) view;
+                textView.setTextColor(android.graphics.Color.WHITE);
+                textView.setBackgroundColor(android.graphics.Color.GRAY);
+                return view;
+            }
+
+            @Override
+            public View getView(int position, View convertView, ViewGroup parent) {
+                View view = super.getView(position, convertView, parent);
+                TextView textView = (TextView) view;
+                textView.setTextColor(android.graphics.Color.WHITE);
+                textView.setBackgroundColor(android.graphics.Color.GRAY);
+                return view;
+            }
+        };
+        spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinnerGenre.setAdapter(spinnerAdapter);
+
+        spinnerGenre.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                currentGenre = genres.get(position);
+                filterMovies();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {}
+        });
+    }
+
+    private void filterMovies() {
         filteredMovies.clear();
-        if (query.isEmpty()) {
-            filteredMovies.addAll(allMovies);
-        } else {
-            String searchQuery = query.toLowerCase();
-            for (Movie movie : allMovies) {
-                if (movie.getFtitle().toLowerCase().contains(searchQuery)) {
-                    filteredMovies.add(movie);
-                }
+        for (Movie movie : allMovies) {
+            boolean matchesGenre = currentGenre.equals("Tất cả") || movie.getFgenre().equals(currentGenre);
+            boolean matchesQuery = currentQuery.isEmpty() || movie.getFtitle().toLowerCase().contains(currentQuery.toLowerCase());
+            if (matchesGenre && matchesQuery) {
+                filteredMovies.add(movie);
             }
         }
         movieAdapter.notifyDataSetChanged();
+
+//        if (filteredMovies.isEmpty()) {
+//            Toast.makeText(getContext(), "No movies found.", Toast.LENGTH_SHORT).show();
+//        }
     }
 
     @Override
     public void onMovieClick(Movie movie, ImageView movieImageView) {
-        // Giữ nguyên logic khi click vào phim
         Intent intent = new Intent(getContext(), MovieDetailActivity.class);
         intent.putExtra("title", movie.getFtitle());
-        intent.putExtra("imgURL", movie.getFthumbnail());
+        intent.putExtra("imgURL", movie.getFpos());
         intent.putExtra("description", movie.getFdes());
         intent.putExtra("videoURL", movie.getTlink());
 
         ActivityOptions options = ActivityOptions.makeSceneTransitionAnimation(
-                getActivity(),
-                movieImageView,
-                "movieImageTransition"
-        );
-
+                getActivity(), movieImageView, "movieImageTransition");
         startActivity(intent, options.toBundle());
-        Toast.makeText(getContext(), "Item clicked: " + movie.getFtitle(), Toast.LENGTH_SHORT).show();
     }
 }

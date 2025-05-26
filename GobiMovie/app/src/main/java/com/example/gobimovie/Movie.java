@@ -5,17 +5,19 @@ public class Movie {
     private String Fdes;
     private String Fthumbnail;
     private String Tlink;
-    private String Fgenre;  // Thêm thuộc tính thể loại
+    private String Fgenre;
+    private String Fpos; // Thuộc tính mới cho poster
 
     public Movie() {
     }
 
-    public Movie(String ftitle, String tlink, String fdes, String fthumbnail, String fgenre) {
+    public Movie(String ftitle, String tlink, String fdes, String fthumbnail, String fgenre, String fpos) {
         Ftitle = ftitle;
         Tlink = tlink;
         Fdes = fdes;
         Fthumbnail = fthumbnail;
         Fgenre = fgenre;
+        Fpos = fpos; // Thêm Fpos vào constructor
     }
 
     public String getFtitle() {
@@ -56,5 +58,13 @@ public class Movie {
 
     public void setFgenre(String fgenre) {
         Fgenre = fgenre;
+    }
+
+    public String getFpos() {
+        return Fpos;
+    }
+
+    public void setFpos(String fpos) {
+        Fpos = fpos;
     }
 }

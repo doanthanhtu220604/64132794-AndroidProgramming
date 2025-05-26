@@ -54,10 +54,10 @@ public class GenreFragment extends Fragment implements MovieItemClickListener {
         genres = new ArrayList<>();
         genres.add("Tất cả");
 
-        // Khởi tạo RecyclerView với GridLayoutManager (3 cột)
+        // Khởi tạo RecyclerView với GridLayoutManager (2 cột)
         movieAdapter = new MovieAdapter(getContext(), filteredMovies, this);
         rvMoviesByGenre.setAdapter(movieAdapter);
-        rvMoviesByGenre.setLayoutManager(new GridLayoutManager(getContext(), 3)); // Sử dụng 3 cột
+        rvMoviesByGenre.setLayoutManager(new GridLayoutManager(getContext(), 2)); // Sử dụng 2 cột
 
         // Lấy dữ liệu từ Firebase
         loadMoviesFromFirebase();
@@ -79,9 +79,10 @@ public class GenreFragment extends Fragment implements MovieItemClickListener {
                     String des = dataSnapshot.child("Fdes").getValue(String.class);
                     String thumbnail = dataSnapshot.child("Fthumbnail").getValue(String.class);
                     String genre = dataSnapshot.child("Fgenre").getValue(String.class);
+                    String poster = dataSnapshot.child("Fpos").getValue(String.class); // Thêm Fpos
 
-                    if (title != null && link != null && des != null && thumbnail != null && genre != null) {
-                        Movie movie = new Movie(title, link, des, thumbnail, genre);
+                    if (title != null && link != null && des != null && thumbnail != null && genre != null && poster != null) {
+                        Movie movie = new Movie(title, link, des, thumbnail, genre, poster); // Truyền thêm Fpos
                         allMovies.add(movie);
                         genreSet.add(genre);
                     }
@@ -158,7 +159,7 @@ public class GenreFragment extends Fragment implements MovieItemClickListener {
     public void onMovieClick(Movie movie, ImageView movieImageView) {
         Intent intent = new Intent(getContext(), MovieDetailActivity.class);
         intent.putExtra("title", movie.getFtitle());
-        intent.putExtra("imgURL", movie.getFthumbnail());
+        intent.putExtra("imgURL", movie.getFpos()); // Sử dụng Fpos thay vì Fthumbnail
         intent.putExtra("description", movie.getFdes());
         intent.putExtra("videoURL", movie.getTlink());
 
@@ -169,6 +170,6 @@ public class GenreFragment extends Fragment implements MovieItemClickListener {
         );
 
         startActivity(intent, options.toBundle());
-        Toast.makeText(getContext(), "Item clicked: " + movie.getFtitle(), Toast.LENGTH_SHORT).show();
+
     }
 }
