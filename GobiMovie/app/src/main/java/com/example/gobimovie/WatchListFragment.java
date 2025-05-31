@@ -195,9 +195,9 @@ public class WatchListFragment extends Fragment implements MovieItemClickListene
         }
         movieAdapter.notifyDataSetChanged();
 
-//        if (filteredMovies.isEmpty()) {
-//            Toast.makeText(getContext(), "No movies found.", Toast.LENGTH_SHORT).show();
-//        }
+        if (filteredMovies.isEmpty()) {
+            Toast.makeText(getContext(), "No movies found.", Toast.LENGTH_SHORT).show();
+        }
     }
 
     @Override

@@ -13,19 +13,62 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:theme="@style/CustomSpinnerStyle"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/search_icon"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <!-- RecyclerView để hiển thị danh sách phim theo thể loại -->
+    <!-- Biểu tượng tìm kiếm -->
+    <ImageView
+        android:id="@+id/search_icon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:contentDescription="Search"
+        android:padding="8dp"
+        android:src="@android:drawable/ic_menu_search"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <!-- Ô nhập tìm kiếm (ẩn ban đầu) -->
+    <EditText
+        android:id="@+id/et_search"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:hint="Nhập từ khóa tìm kiếm..."
+        android:textColor="@android:color/white"
+        android:textColorHint="#B0B0B0"
+        android:padding="12dp"
+        android:drawableStart="@android:drawable/ic_menu_search"
+        android:drawablePadding="8dp"
+        android:textSize="16sp"
+        android:visibility="gone"
+        app:layout_constraintEnd_toStartOf="@id/cancel_search"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/spinner_genre"
+        android:layout_marginTop="8dp" />
+
+    <!-- Nút hủy tìm kiếm (ẩn ban đầu) -->
+    <ImageView
+        android:id="@+id/cancel_search"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@android:drawable/ic_menu_close_clear_cancel"
+        android:contentDescription="Cancel Search"
+        android:padding="8dp"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/spinner_genre"
+        android:layout_marginTop="8dp" />
+
+    <!-- RecyclerView để hiển thị danh sách phim -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rv_movies_by_genre"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginTop="24dp"
+        android:background="@android:color/transparent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/spinner_genre" />
+        app:layout_constraintTop_toBottomOf="@id/et_search" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,13 +1,17 @@
 package com.example.gobimovie;
 
+import android.annotation.SuppressLint;
 import android.app.ActivityOptions;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -30,14 +34,19 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-public class GenreFragment extends Fragment implements MovieItemClickListener {
+public class GenreFragment extends Fragment implements SeriesAdapter.SeriesItemClickListener {
     private Spinner spinnerGenre;
-    private RecyclerView rvMoviesByGenre;
-    private MovieAdapter movieAdapter;
-    private List<Movie> allMovies;
-    private List<Movie> filteredMovies;
+    private ImageView searchIcon, cancelSearch;
+    private EditText etSearch;
+    private RecyclerView rvSeriesByGenre;
+    private SeriesAdapter seriesAdapter;
+    private List<Series> allSeries;
+    private List<Series> filteredSeries;
     private List<String> genres;
+    private String currentGenre = "Tất cả";
+    private String currentQuery = "";
 
+    @SuppressLint("MissingInflatedId")
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
@@ -46,44 +55,81 @@ public class GenreFragment extends Fragment implements MovieItemClickListener {
 
         // Ánh xạ các thành phần giao diện
         spinnerGenre = view.findViewById(R.id.spinner_genre);
-        rvMoviesByGenre = view.findViewById(R.id.rv_movies_by_genre);
+        searchIcon = view.findViewById(R.id.search_icon);
+        etSearch = view.findViewById(R.id.et_search);
+        cancelSearch = view.findViewById(R.id.cancel_search);
+        rvSeriesByGenre = view.findViewById(R.id.rv_movies_by_genre);
 
         // Khởi tạo danh sách
-        allMovies = new ArrayList<>();
-        filteredMovies = new ArrayList<>();
+        allSeries = new ArrayList<>();
+        filteredSeries = new ArrayList<>();
         genres = new ArrayList<>();
         genres.add("Tất cả");
 
         // Khởi tạo RecyclerView với GridLayoutManager (2 cột)
-        movieAdapter = new MovieAdapter(getContext(), filteredMovies, this);
-        rvMoviesByGenre.setAdapter(movieAdapter);
-        rvMoviesByGenre.setLayoutManager(new GridLayoutManager(getContext(), 2)); // Sử dụng 2 cột
+        seriesAdapter = new SeriesAdapter(getContext(), filteredSeries, this);
+        rvSeriesByGenre.setAdapter(seriesAdapter);
+        rvSeriesByGenre.setLayoutManager(new GridLayoutManager(getContext(), 2));
+        rvSeriesByGenre.setHasFixedSize(true); // Tối ưu hiệu suất
 
         // Lấy dữ liệu từ Firebase
-        loadMoviesFromFirebase();
+        loadSeriesFromFirebase();
+
+        // Sự kiện nhấn icon tìm kiếm
+        searchIcon.setOnClickListener(v -> {
+            searchIcon.setVisibility(View.GONE);
+            etSearch.setVisibility(View.VISIBLE);
+            cancelSearch.setVisibility(View.VISIBLE);
+            etSearch.requestFocus(); // Mở bàn phím
+        });
+
+        // Sự kiện nhấn nút hủy
+        cancelSearch.setOnClickListener(v -> {
+            etSearch.setText("");
+            etSearch.setVisibility(View.GONE);
+            cancelSearch.setVisibility(View.GONE);
+            searchIcon.setVisibility(View.VISIBLE);
+            currentQuery = "";
+            filterSeries(); // Cập nhật danh sách theo thể loại
+        });
+
+        // TextWatcher cho tìm kiếm
+        etSearch.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                currentQuery = s.toString().trim();
+                filterSeries();
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {}
+        });
 
         return view;
     }
 
-    private void loadMoviesFromFirebase() {
-        DatabaseReference movieRef = FirebaseDatabase.getInstance().getReference("featured");
-        movieRef.addValueEventListener(new ValueEventListener() {
+    private void loadSeriesFromFirebase() {
+        DatabaseReference seriesRef = FirebaseDatabase.getInstance().getReference("series");
+        seriesRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                allMovies.clear();
+                allSeries.clear();
                 Set<String> genreSet = new HashSet<>();
 
                 for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
-                    String title = dataSnapshot.child("Ftitle").getValue(String.class);
-                    String link = dataSnapshot.child("Tlink").getValue(String.class);
-                    String des = dataSnapshot.child("Fdes").getValue(String.class);
-                    String thumbnail = dataSnapshot.child("Fthumbnail").getValue(String.class);
-                    String genre = dataSnapshot.child("Fgenre").getValue(String.class);
-                    String poster = dataSnapshot.child("Fpos").getValue(String.class); // Thêm Fpos
+                    String title = dataSnapshot.child("Stitle").getValue(String.class);
+                    String link = dataSnapshot.child("Slink").getValue(String.class);
+                    String des = dataSnapshot.child("Sdes").getValue(String.class);
+                    String thumbnail = dataSnapshot.child("Sthumbnail").getValue(String.class);
+                    String genre = dataSnapshot.child("Sgenre").getValue(String.class);
+                    String poster = dataSnapshot.child("Spos").getValue(String.class);
 
                     if (title != null && link != null && des != null && thumbnail != null && genre != null && poster != null) {
-                        Movie movie = new Movie(title, link, des, thumbnail, genre, poster); // Truyền thêm Fpos
-                        allMovies.add(movie);
+                        Series series = new Series(title, poster, genre, link, thumbnail, des);
+                        allSeries.add(series);
                         genreSet.add(genre);
                     }
                 }
@@ -93,25 +139,24 @@ public class GenreFragment extends Fragment implements MovieItemClickListener {
                 genres.addAll(genreSet);
                 setupGenreSpinner();
 
-                filterMovies("Tất cả");
+                filterSeries();
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-                Toast.makeText(getContext(), "Failed to load movies: " + error.getMessage(), Toast.LENGTH_SHORT).show();
+                showToast("Không thể tải series: " + error.getMessage());
             }
         });
     }
 
     private void setupGenreSpinner() {
-        // Tùy chỉnh Adapter cho Spinner với màu chữ trắng và background xám nhạt
         ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<String>(getContext(), android.R.layout.simple_spinner_item, genres) {
             @Override
             public View getDropDownView(int position, View convertView, ViewGroup parent) {
                 View view = super.getDropDownView(position, convertView, parent);
                 TextView textView = (TextView) view;
-                textView.setTextColor(android.graphics.Color.WHITE); // Màu chữ trắng cho dropdown
-                textView.setBackgroundColor(android.graphics.Color.GRAY); // Background xám nhạt cho dropdown
+                textView.setTextColor(android.graphics.Color.WHITE);
+                textView.setBackgroundColor(android.graphics.Color.DKGRAY);
                 return view;
             }
 
@@ -119,8 +164,8 @@ public class GenreFragment extends Fragment implements MovieItemClickListener {
             public View getView(int position, View convertView, ViewGroup parent) {
                 View view = super.getView(position, convertView, parent);
                 TextView textView = (TextView) view;
-                textView.setTextColor(android.graphics.Color.WHITE); // Màu chữ trắng cho item được chọn
-                textView.setBackgroundColor(android.graphics.Color.GRAY); // Background xám nhạt cho item được chọn
+                textView.setTextColor(android.graphics.Color.WHITE);
+                textView.setBackgroundColor(android.graphics.Color.GRAY);
                 return view;
             }
         };
@@ -130,46 +175,59 @@ public class GenreFragment extends Fragment implements MovieItemClickListener {
         spinnerGenre.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                String selectedGenre = genres.get(position);
-                filterMovies(selectedGenre);
+                currentGenre = genres.get(position);
+                filterSeries();
             }
 
             @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-                // Không làm gì
-            }
+            public void onNothingSelected(AdapterView<?> parent) {}
         });
     }
 
-    private void filterMovies(String genre) {
-        filteredMovies.clear();
-        if (genre.equals("Tất cả")) {
-            filteredMovies.addAll(allMovies);
-        } else {
-            for (Movie movie : allMovies) {
-                if (genre.equals(movie.getFgenre())) {
-                    filteredMovies.add(movie);
-                }
+    private void filterSeries() {
+        filteredSeries.clear();
+        for (Series series : allSeries) {
+            boolean matchesGenre = currentGenre.equals("Tất cả") || series.getSgenre().equals(currentGenre);
+            boolean matchesQuery = currentQuery.isEmpty() || series.getStitle().toLowerCase().contains(currentQuery.toLowerCase());
+            if (matchesGenre && matchesQuery) {
+                filteredSeries.add(series);
             }
         }
-        movieAdapter.notifyDataSetChanged();
+        seriesAdapter.notifyDataSetChanged();
+
+        if (filteredSeries.isEmpty()) {
+            showToast("Không tìm thấy series nào.");
+        }
     }
 
     @Override
-    public void onMovieClick(Movie movie, ImageView movieImageView) {
-        Intent intent = new Intent(getContext(), MovieDetailActivity.class);
-        intent.putExtra("title", movie.getFtitle());
-        intent.putExtra("imgURL", movie.getFpos()); // Sử dụng Fpos thay vì Fthumbnail
-        intent.putExtra("description", movie.getFdes());
-        intent.putExtra("videoURL", movie.getTlink());
+    public void onSeriesClick(Series series, ImageView seriesImageView) {
+        if (getContext() != null && getActivity() != null) {
+            Intent intent = new Intent(getContext(), SeriesDetailActivity.class);
+            intent.putExtra("title", series.getStitle());
+            intent.putExtra("imgURL", series.getSpos());
+            intent.putExtra("description", series.getSdes());
 
-        ActivityOptions options = ActivityOptions.makeSceneTransitionAnimation(
-                getActivity(),
-                movieImageView,
-                "movieImageTransition"
-        );
+            ActivityOptions options = ActivityOptions.makeSceneTransitionAnimation(
+                    getActivity(), seriesImageView, "movieImageTransition");
+            startActivity(intent, options.toBundle());
+        }
+    }
 
-        startActivity(intent, options.toBundle());
+    private void showToast(String message) {
+        if (getContext() != null) {
+            Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show();
+        }
+    }
 
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        spinnerGenre = null;
+        searchIcon = null;
+        etSearch = null;
+        cancelSearch = null;
+        rvSeriesByGenre = null;
+        seriesAdapter = null;
     }
 }

@@ -1,119 +1,158 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/black"
     tools:context=".MovieDetailActivity">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <!-- Toolbar cố định ở đầu -->
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/appBarLayout"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:paddingBottom="16dp">
+        android:layout_height="40dp"
+        android:background="@color/black">
 
-        <ImageView
-            android:id="@+id/detail_movie_cover"
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar"
             android:layout_width="match_parent"
-            android:layout_height="245dp"
-            android:scaleType="fitXY"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            tools:srcCompat="@tools:sample/backgrounds/scenic" />
+            android:layout_height="?attr/actionBarSize"
+            android:background="@color/black"
+            app:titleTextColor="@android:color/white">
 
-        <ImageView
-            android:id="@+id/imageView4"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            app:layout_constraintBottom_toBottomOf="@+id/detail_movie_cover"
-            app:layout_constraintEnd_toEndOf="@+id/detail_movie_cover"
-            app:layout_constraintStart_toStartOf="@+id/detail_movie_cover"
-            app:layout_constraintTop_toTopOf="@+id/detail_movie_cover"
-            app:srcCompat="@drawable/gradien_bg" />
+            <!-- Nút quay lại -->
+            <ImageButton
+                android:id="@+id/button_back"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@android:color/transparent"
+                app:srcCompat="@drawable/baseline_arrow_back_24"
+                app:tint="@android:color/white" />
 
-        <ImageView
-            android:id="@+id/detail_movie_img"
-            android:layout_width="150dp"
-            android:layout_height="175dp"
-            android:layout_marginStart="24dp"
-            android:scaleType="fitXY"
-            android:src="@drawable/cuochonnhanhoanhoa"
-            android:transitionName="movieImageTransition"
-            app:layout_constraintBottom_toBottomOf="@+id/detail_movie_cover"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/detail_movie_cover" />
+            <!-- Tiêu đề màn hình -->
 
-        <TextView
-            android:id="@+id/detail_movie_title"
-            android:layout_width="0dp"
+        </androidx.appcompat.widget.Toolbar>
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <!-- NestedScrollView chứa nội dung -->
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/main"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="16dp"
-            android:layout_marginEnd="16dp"
-            android:text="TextView"
-            android:textColor="@android:color/white"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/detail_movie_img"
-            app:layout_constraintTop_toBottomOf="@+id/detail_movie_cover" />
+            android:paddingBottom="16dp">
 
-        <Button
-            android:id="@+id/button_watch_movie"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="24dp"
-            android:layout_marginTop="8dp"
-            android:layout_marginEnd="24dp"
-            android:backgroundTint="@color/design_default_color_error"
-            android:text="Xem Phim"
-            android:textColor="@android:color/white"
-            app:icon="@drawable/baseline_play_circle_24"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/detail_movie_img"
-            app:layout_constraintTop_toBottomOf="@+id/detail_movie_title" />
+            <ImageView
+                android:id="@+id/detail_movie_cover"
+                android:layout_width="match_parent"
+                android:layout_height="245dp"
+                android:scaleType="fitXY"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:srcCompat="@tools:sample/backgrounds/scenic" />
 
-        <Button
-            android:id="@+id/button_view_details"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="24dp"
-            android:layout_marginTop="8dp"
-            android:layout_marginEnd="24dp"
-            android:backgroundTint="@color/design_default_color_error"
-            android:text="Chi Tiết"
-            android:textColor="@android:color/white"
-            app:icon="@drawable/baseline_info_24"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.484"
-            app:layout_constraintStart_toEndOf="@+id/detail_movie_img"
-            app:layout_constraintTop_toBottomOf="@+id/button_watch_movie" />
+            <ImageView
+                android:id="@+id/imageView4"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                app:layout_constraintBottom_toBottomOf="@+id/detail_movie_cover"
+                app:layout_constraintEnd_toEndOf="@+id/detail_movie_cover"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="@+id/detail_movie_cover"
+                app:layout_constraintTop_toTopOf="@+id/detail_movie_cover"
+                app:layout_constraintVertical_bias="1.0"
+                app:srcCompat="@drawable/gradien_bg" />
 
-        <TextView
-            android:id="@+id/description_label"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="16dp"
-            android:text="Mô tả"
-            android:textColor="@android:color/white"
-            android:textStyle="bold"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/button_view_details" />
+            <ImageView
+                android:id="@+id/detail_movie_img"
+                android:layout_width="150dp"
+                android:layout_height="175dp"
+                android:layout_marginStart="24dp"
+                android:scaleType="fitXY"
+                android:src="@drawable/cuochonnhanhoanhoa"
+                android:transitionName="movieImageTransition"
+                app:layout_constraintBottom_toBottomOf="@+id/detail_movie_cover"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/detail_movie_cover" />
 
-        <TextView
-            android:id="@+id/detail_movie_desc"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="8dp"
-            android:layout_marginEnd="16dp"
-            android:text="TextView"
-            android:textColor="#2196F3"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/description_label" />
+            <TextView
+                android:id="@+id/detail_movie_title"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginEnd="16dp"
+                android:text="TextView"
+                android:textColor="@android:color/white"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/detail_movie_img"
+                app:layout_constraintTop_toBottomOf="@+id/detail_movie_cover" />
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
-</androidx.core.widget.NestedScrollView>
+            <Button
+                android:id="@+id/button_watch_movie"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="24dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="24dp"
+                android:backgroundTint="@color/design_default_color_error"
+                android:text="Xem Phim"
+                android:textColor="@android:color/white"
+                app:icon="@drawable/baseline_play_circle_24"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/detail_movie_img"
+                app:layout_constraintTop_toBottomOf="@+id/detail_movie_title" />
+
+            <Button
+                android:id="@+id/button_view_details"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="24dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="24dp"
+                android:backgroundTint="@color/design_default_color_error"
+                android:text="Chi Tiết"
+                android:textColor="@android:color/white"
+                app:icon="@drawable/baseline_info_24"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.484"
+                app:layout_constraintStart_toEndOf="@+id/detail_movie_img"
+                app:layout_constraintTop_toBottomOf="@+id/button_watch_movie" />
+
+            <TextView
+                android:id="@+id/description_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="16dp"
+                android:text="Mô tả"
+                android:textColor="@android:color/white"
+                android:textStyle="bold"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/button_view_details" />
+
+            <TextView
+                android:id="@+id/detail_movie_desc"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="16dp"
+                android:text="TextView"
+                android:textColor="#2196F3"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/description_label" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.core.widget.NestedScrollView>
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

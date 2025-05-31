@@ -9,11 +9,11 @@
     <item
         android:id="@+id/mnu_Genre"
         android:icon="@drawable/baseline_local_movies_24"
-        android:title="Genre" />
+        android:title="Series" />
     <item
         android:id="@+id/mnu_WatchList"
         android:icon="@drawable/baseline_bookmark_24"
-        android:title="Watch List" />
+        android:title="Movies" />
     <item
         android:id="@+id/mnu_MyProfile"
         android:icon="@drawable/baseline_person_24"
