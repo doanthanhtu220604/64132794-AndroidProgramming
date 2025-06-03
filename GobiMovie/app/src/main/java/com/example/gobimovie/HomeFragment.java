@@ -201,7 +201,7 @@ public class HomeFragment extends Fragment implements MovieItemClickListener, Se
         if (tvSeeAllMovies != null) {
             tvSeeAllMovies.setOnClickListener(v -> {
                 if (getActivity() != null && mContext != null) {
-                    WatchListFragment watchListFragment = new WatchListFragment();
+                    MoviesFragment watchListFragment = new MoviesFragment();
                     ViewGroup parentContainer = (ViewGroup) getView().getParent();
                     int containerId = parentContainer != null ? parentContainer.getId() : -1;
 
@@ -230,7 +230,7 @@ public class HomeFragment extends Fragment implements MovieItemClickListener, Se
         if (tvSeeAllSeries != null) {
             tvSeeAllSeries.setOnClickListener(v -> {
                 if (getActivity() != null && mContext != null) {
-                    GenreFragment genreFragment = new GenreFragment();
+                    SeriesFragment genreFragment = new SeriesFragment();
                     ViewGroup parentContainer = (ViewGroup) getView().getParent();
                     int containerId = parentContainer != null ? parentContainer.getId() : -1;
 

@@ -59,9 +59,15 @@ public class MovieDetailActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 String videoUrl = getIntent().getStringExtra("videoURL");
+                String title = getIntent().getStringExtra("title");
+                String imageUrl = getIntent().getStringExtra("imgURL");
+
                 if (videoUrl != null && !videoUrl.isEmpty()) {
                     Intent intent = new Intent(MovieDetailActivity.this, MoviePlayerActivity.class);
                     intent.putExtra("VIDEO_URL", videoUrl);
+                    intent.putExtra("VIDEO_TITLE", title);
+                    intent.putExtra("IMG_URL", imageUrl);
+
                     startActivity(intent);
                 } else {
                     Toast.makeText(MovieDetailActivity.this, "Không tìm thấy URL video!", Toast.LENGTH_SHORT).show();

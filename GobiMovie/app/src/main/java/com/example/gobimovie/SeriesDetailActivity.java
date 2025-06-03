@@ -30,11 +30,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class SeriesDetailActivity extends AppCompatActivity {
+
     private ImageView seriesThumbnailImg, seriesCoverImg;
     private TextView tv_title, tv_description;
     private ImageButton buttonBack;
     private Button buttonViewDetails;
     private RecyclerView rvParts;
+
     private PartAdapter partAdapter;
     private List<Part> partList;
     private String seriesGenre;
@@ -44,42 +46,36 @@ public class SeriesDetailActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_series_detail);
+
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
 
-        // Khởi tạo giao diện và hiển thị dữ liệu
         initView();
 
-        // Thiết lập sự kiện cho nút "Trở về"
         buttonBack = findViewById(R.id.button_back);
         buttonBack.setOnClickListener(v -> finish());
 
-        // Thiết lập sự kiện cho nút "Xem Chi Tiết"
         buttonViewDetails = findViewById(R.id.button_view_details);
         buttonViewDetails.setOnClickListener(v -> {
-            // Lấy dữ liệu từ Intent
             String title = getIntent().getStringExtra("title");
             String description = getIntent().getStringExtra("description");
 
-            // Mở MovieFullDetailsActivity và truyền dữ liệu
             Intent intent = new Intent(SeriesDetailActivity.this, MovieFullDetailsActivity.class);
             intent.putExtra("title", title);
             intent.putExtra("description", description);
-            intent.putExtra("genre", seriesGenre); // Truyền thể loại lấy từ Firebase
+            intent.putExtra("genre", seriesGenre);
             startActivity(intent);
         });
     }
 
-    void initView() {
-        // Lấy dữ liệu từ Intent
+    private void initView() {
         String seriesTitle = getIntent().getStringExtra("title");
         String imageUrl = getIntent().getStringExtra("imgURL");
         String description = getIntent().getStringExtra("description");
 
-        // Khởi tạo ImageView
         seriesThumbnailImg = findViewById(R.id.detail_series_img);
         Glide.with(this)
                 .load(imageUrl)
@@ -88,27 +84,23 @@ public class SeriesDetailActivity extends AppCompatActivity {
 
         seriesCoverImg = findViewById(R.id.detail_series_cover);
 
-        // Đặt tiêu đề
         tv_title = findViewById(R.id.detail_series_title);
         if (seriesTitle != null) {
             tv_title.setText(seriesTitle);
         }
 
-        // Đặt mô tả
         tv_description = findViewById(R.id.detail_series_desc);
         if (description != null) {
             tv_description.setText(description);
         }
 
-        // Khởi tạo RecyclerView cho danh sách tập
         rvParts = findViewById(R.id.rv_parts);
         partList = new ArrayList<>();
         partAdapter = new PartAdapter(this, partList);
-        rvParts.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)); // Sử dụng hướng ngang
+        rvParts.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
         rvParts.setHasFixedSize(true);
         rvParts.setAdapter(partAdapter);
 
-        // Lấy dữ liệu từ Firebase dựa trên tiêu đề series
         if (seriesTitle != null) {
             fetchSeriesDetailsFromFirebase(seriesTitle);
         }
@@ -122,7 +114,6 @@ public class SeriesDetailActivity extends AppCompatActivity {
                 for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
                     String title = dataSnapshot.child("Stitle").getValue(String.class);
                     if (title != null && title.equals(seriesTitle)) {
-                        // Lấy thể loại và thumbnail
                         seriesGenre = dataSnapshot.child("Sgenre").getValue(String.class);
                         String thumbnail = dataSnapshot.child("Sthumbnail").getValue(String.class);
                         if (thumbnail != null) {
@@ -132,7 +123,6 @@ public class SeriesDetailActivity extends AppCompatActivity {
                                     .into(seriesCoverImg);
                         }
 
-                        // Lấy danh sách tập phim
                         DataSnapshot partsSnapshot = dataSnapshot.child("parts");
                         partList.clear();
                         for (DataSnapshot partSnapshot : partsSnapshot.getChildren()) {
@@ -145,7 +135,6 @@ public class SeriesDetailActivity extends AppCompatActivity {
                         }
                         partAdapter.notifyDataSetChanged();
 
-                        // Ẩn RecyclerView nếu không có tập
                         if (partList.isEmpty()) {
                             rvParts.setVisibility(View.GONE);
                             findViewById(R.id.parts_label).setVisibility(View.GONE);
@@ -158,6 +147,7 @@ public class SeriesDetailActivity extends AppCompatActivity {
                         break;
                     }
                 }
+
                 if (seriesGenre == null) {
                     seriesGenre = "Không xác định";
                     Log.d("SeriesDetailActivity", "Genre not found in Firebase for series.");
@@ -166,7 +156,7 @@ public class SeriesDetailActivity extends AppCompatActivity {
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-                Toast.makeText(SeriesDetailActivity.this, "Lỗi khi lấy dữ liệu từ series: " + error.getMessage(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(SeriesDetailActivity.this, "Lỗi khi lấy dữ liệu: " + error.getMessage(), Toast.LENGTH_SHORT).show();
                 seriesGenre = "Không xác định";
             }
         });

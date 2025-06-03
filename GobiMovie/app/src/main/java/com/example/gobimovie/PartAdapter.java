@@ -2,6 +2,7 @@ package com.example.gobimovie;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,7 +14,12 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class PartAdapter extends RecyclerView.Adapter<PartAdapter.MyViewHolder> {
     private Context context;
@@ -37,12 +43,34 @@ public class PartAdapter extends RecyclerView.Adapter<PartAdapter.MyViewHolder> 
         holder.part_name.setText(part.getPart());
         Glide.with(context).load(part.getUrl()).into(holder.part_image);
 
-        // Xử lý click để phát video (tùy chọn)
         holder.itemView.setOnClickListener(v -> {
+            // Mở MoviePlayerActivity
             Intent intent = new Intent(context, MoviePlayerActivity.class);
             intent.putExtra("VIDEO_URL", part.getVidUrl());
             context.startActivity(intent);
+
+            // Lưu vào danh sách đã xem (chỉ lưu tên tập và ảnh tập)
+            SharedPreferences prefs = context.getSharedPreferences("WatchedMovies", Context.MODE_PRIVATE);
+            SharedPreferences.Editor editor = prefs.edit();
+
+            // Lấy danh sách hiện tại (nếu có), nếu không thì tạo mới
+            Set<String> watchedSet = new HashSet<>(prefs.getStringSet("watched_movies", new HashSet<>()));
+
+            try {
+                JSONObject json = new JSONObject();
+                json.put("title", part.getPart());       // ✅ Tên tập phim
+                json.put("thumbnail", part.getUrl());    // ✅ Ảnh tập phim
+                json.put("videoUrl", part.getVidUrl());  // ✅ Link video
+
+                watchedSet.add(json.toString());
+
+                editor.putStringSet("watched_movies", watchedSet);
+                editor.apply();
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
         });
+
     }
 
     @Override

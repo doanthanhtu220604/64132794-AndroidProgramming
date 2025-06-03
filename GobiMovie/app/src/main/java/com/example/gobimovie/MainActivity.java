@@ -11,10 +11,11 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
-import com.google.android.material.navigation.NavigationBarView;
+
 import android.view.MenuItem;
 
 public class MainActivity extends AppCompatActivity {
+    // Khai báo biến BottomNavigationView để điều khiển thanh điều hướng dưới cùng
     BottomNavigationView bottomNav;
 
     @Override
@@ -41,9 +42,9 @@ public class MainActivity extends AppCompatActivity {
                 if (item.getItemId() == R.id.mnu_Home) {
                     selectedFragment = new HomeFragment();
                 } else if (item.getItemId() == R.id.mnu_Genre) {
-                    selectedFragment = new GenreFragment();
+                    selectedFragment = new SeriesFragment();
                 } else if (item.getItemId() == R.id.mnu_WatchList) {
-                    selectedFragment = new WatchListFragment();
+                    selectedFragment = new MoviesFragment();
                 } else if (item.getItemId() == R.id.mnu_MyProfile) {
                     selectedFragment = new ProfileFragment();
                 } else {
