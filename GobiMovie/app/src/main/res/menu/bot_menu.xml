@@ -12,10 +12,10 @@
         android:title="Series" />
     <item
         android:id="@+id/mnu_WatchList"
-        android:icon="@drawable/baseline_bookmark_24"
+        android:icon="@drawable/baseline_local_movies_24"
         android:title="Movies" />
     <item
         android:id="@+id/mnu_MyProfile"
         android:icon="@drawable/baseline_person_24"
-        android:title="My Profile" />
+        android:title="Personal" />
 </menu>

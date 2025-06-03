@@ -17,18 +17,6 @@
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/ic_launcher_background" />
 
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/floatingActionButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:clickable="true"
-        app:backgroundTint="@android:color/holo_orange_light"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="@+id/slide_img"
-        app:layout_constraintTop_toTopOf="@+id/slide_img"
-        app:srcCompat="@drawable/baseline_play_arrow_24" />
-
     <ImageView
         android:id="@+id/imageView2"
         android:layout_width="0dp"
