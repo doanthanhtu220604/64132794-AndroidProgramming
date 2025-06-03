@@ -195,9 +195,9 @@ public class SeriesFragment extends Fragment implements SeriesAdapter.SeriesItem
         }
         seriesAdapter.notifyDataSetChanged();
 
-        if (filteredSeries.isEmpty()) {
-            showToast("Không tìm thấy series nào.");
-        }
+//        if (filteredSeries.isEmpty()) {
+//            showToast("Không tìm thấy series nào.");
+//        }
     }
 
     @Override

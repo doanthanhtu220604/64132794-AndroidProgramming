@@ -4,25 +4,63 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/black"
     tools:context=".ProfileFragment">
 
-    <Button
-        android:id="@+id/button_watched"
+    <!-- Tên người dùng -->
+
+    <!-- Nút "Phim đã xem" -->
+
+    <!-- Nút "Phim yêu thích" -->
+    <TextView
+        android:id="@+id/username_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="124dp"
-        android:text="Phim đã xem"
+        android:layout_marginTop="112dp"
+        android:text="Màn hình cá nhân"
+        android:textColor="#FFFFFF"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.462"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <Button
-        android:id="@+id/button2"
-        android:layout_width="wrap_content"
+        android:id="@+id/button_watched"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="28dp"
-        android:layout_marginTop="60dp"
-        android:text="Button"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="120dp"
+        android:layout_marginEnd="8dp"
+        android:backgroundTint="#0288D1"
+        android:elevation="2dp"
+        android:padding="12dp"
+        android:text="Phim đã xem"
+        android:textAllCaps="false"
+        android:textColor="#FFFFFF"
+        app:cornerRadius="8dp"
+        app:layout_constraintEnd_toStartOf="@id/button_favorites"
+        app:layout_constraintHorizontal_chainStyle="spread"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/button_watched" />
+        app:layout_constraintTop_toBottomOf="@id/username_text" />
+
+    <Button
+        android:id="@+id/button_favorites"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="120dp"
+        android:layout_marginEnd="16dp"
+        android:backgroundTint="#0288D1"
+        android:elevation="2dp"
+        android:padding="12dp"
+        android:text="Phim yêu thích"
+        android:textAllCaps="false"
+        android:textColor="#FFFFFF"
+        app:cornerRadius="8dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/button_watched"
+        app:layout_constraintTop_toBottomOf="@id/username_text" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

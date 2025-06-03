@@ -79,19 +79,25 @@
         <!-- View Details Button -->
 
         <!-- Parts List Title -->
+
         <Button
             android:id="@+id/button_view_details"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="88dp"
-            android:layout_marginTop="36dp"
+            android:layout_marginStart="72dp"
+            android:layout_marginTop="56dp"
+            android:layout_marginBottom="56dp"
             android:backgroundTint="@color/design_default_color_error"
             android:text="Chi Tiết"
             android:textColor="@android:color/white"
             android:textSize="14sp"
             app:icon="@drawable/baseline_info_24"
+            app:layout_constraintBottom_toTopOf="@+id/rv_parts"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.012"
             app:layout_constraintStart_toEndOf="@id/detail_series_img"
-            app:layout_constraintTop_toBottomOf="@id/detail_series_title" />
+            app:layout_constraintTop_toBottomOf="@id/detail_series_title"
+            app:layout_constraintVertical_bias="0.285" />
 
         <TextView
             android:id="@+id/parts_label"
@@ -146,6 +152,15 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/description_label" />
+
+        <Button
+            android:id="@+id/button_favsr"
+            android:layout_width="68dp"
+            android:layout_height="40dp"
+            android:backgroundTint="#DE7575"
+            app:icon="@drawable/baseline_favorite_24"
+            app:layout_constraintBottom_toBottomOf="@+id/detail_series_img"
+            app:layout_constraintEnd_toEndOf="@+id/detail_series_img" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.core.widget.NestedScrollView>

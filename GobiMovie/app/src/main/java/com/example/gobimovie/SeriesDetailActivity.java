@@ -1,6 +1,7 @@
 package com.example.gobimovie;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -26,17 +27,21 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class SeriesDetailActivity extends AppCompatActivity {
 
     private ImageView seriesThumbnailImg, seriesCoverImg;
     private TextView tv_title, tv_description;
     private ImageButton buttonBack;
-    private Button buttonViewDetails;
+    private Button buttonViewDetails, buttonAddToFavorites;
     private RecyclerView rvParts;
-
     private PartAdapter partAdapter;
     private List<Part> partList;
     private String seriesGenre;
@@ -69,6 +74,10 @@ public class SeriesDetailActivity extends AppCompatActivity {
             intent.putExtra("genre", seriesGenre);
             startActivity(intent);
         });
+
+        // Thiết lập sự kiện cho nút "Thêm vào yêu thích"
+        buttonAddToFavorites = findViewById(R.id.button_favsr);
+        buttonAddToFavorites.setOnClickListener(v -> addToFavorites());
     }
 
     private void initView() {
@@ -160,5 +169,54 @@ public class SeriesDetailActivity extends AppCompatActivity {
                 seriesGenre = "Không xác định";
             }
         });
+    }
+
+    private void addToFavorites() {
+        String title = getIntent().getStringExtra("title");
+        String imageUrl = getIntent().getStringExtra("imgURL");
+        String description = getIntent().getStringExtra("description");
+
+        if (title == null || title.isEmpty()) {
+            Toast.makeText(this, "Không thể thêm series do thiếu tiêu đề!", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        try {
+            JSONObject seriesJson = new JSONObject();
+            seriesJson.put("title", title);
+            seriesJson.put("thumbnail", imageUrl != null ? imageUrl : "");
+            seriesJson.put("description", description != null ? description : "");
+            seriesJson.put("videoUrl", ""); // Series không có videoUrl chung
+            seriesJson.put("genre", seriesGenre != null ? seriesGenre : "Không xác định");
+            seriesJson.put("isSeries", true); // Đánh dấu là series
+
+            SharedPreferences prefs = getSharedPreferences("FavoriteMovies", MODE_PRIVATE);
+            Set<String> favoriteMoviesSet = new HashSet<>(prefs.getStringSet("favorite_movies", new HashSet<>()));
+
+            // Kiểm tra xem series đã có trong danh sách yêu thích chưa
+            boolean isAlreadyFavorite = false;
+            for (String json : favoriteMoviesSet) {
+                try {
+                    JSONObject existingItem = new JSONObject(json);
+                    if (existingItem.getString("title").equals(title)) {
+                        isAlreadyFavorite = true;
+                        break;
+                    }
+                } catch (JSONException e) {
+                    Log.e("SeriesDetailActivity", "Lỗi khi phân tích JSON: " + e.getMessage());
+                }
+            }
+
+            if (isAlreadyFavorite) {
+                Toast.makeText(this, "Series đã có trong danh sách yêu thích!", Toast.LENGTH_SHORT).show();
+            } else {
+                favoriteMoviesSet.add(seriesJson.toString());
+                prefs.edit().putStringSet("favorite_movies", favoriteMoviesSet).apply();
+                Toast.makeText(this, "Đã thêm series vào danh sách yêu thích", Toast.LENGTH_SHORT).show();
+            }
+        } catch (JSONException e) {
+            Log.e("SeriesDetailActivity", "Lỗi khi tạo JSON: " + e.getMessage());
+            Toast.makeText(this, "Lỗi khi thêm series vào yêu thích", Toast.LENGTH_SHORT).show();
+        }
     }
 }

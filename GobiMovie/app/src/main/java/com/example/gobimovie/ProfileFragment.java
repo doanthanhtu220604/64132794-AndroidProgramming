@@ -30,6 +30,17 @@ public class ProfileFragment extends Fragment {
             Toast.makeText(getContext(), "Không tìm thấy nút Phim đã xem", Toast.LENGTH_SHORT).show();
         }
 
+        // Ánh xạ nút "Phim yêu thích"
+        Button favoritesButton = view.findViewById(R.id.button_favorites);
+        if (favoritesButton != null) {
+            favoritesButton.setOnClickListener(v -> {
+                Intent intent = new Intent(getActivity(), FavoritesMoviesActivity.class);
+                startActivity(intent);
+            });
+        } else {
+            Toast.makeText(getContext(), "Không tìm thấy nút Phim yêu thích", Toast.LENGTH_SHORT).show();
+        }
+
         return view;
     }
 }
